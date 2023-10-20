@@ -34,11 +34,32 @@ async function run() {
     const database = client.db('brewBite');
     const prodCollection = database.collection('products');
 
+    // find multiple document by brand name
+    app.get('/products/:brand', async(req, res)=> {
+        const brand = req.params.brand;
+        const query = {"brand": brand}
+        const cursor = prodCollection.find(query);
+
+        const result = await cursor.toArray();
+        if(prodCollection.countDocuments(query) === 0){
+            res.send('No product added to this');
+        }
+        res.send(result)
+    })
+
     // Find multiple document/all data from database
     app.get('/products', async(req, res)=> {
         const allProducts = prodCollection.find();
         const result = await allProducts.toArray();
         res.send(result);
+    })
+
+    //Find single doc by product name
+    app.get('/products/:brand/:prodName', async(req, res)=> {
+      const prodName = req.params.prodName;
+      const query = {"prodName": prodName};
+      const product = await prodCollection.findOne(query);
+      res.send(product);
     })
     
     // Insert document/data to database from client side 
