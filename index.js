@@ -63,6 +63,14 @@ async function run() {
       res.send(product);
     })
 
+    // Find data in the prodCollection with a specific id
+    app.get('/productsId/:id', async(req, res)=> {
+      const id = req.params.id;
+      const query = {"_id": new ObjectId(id)};
+      const result = await prodCollection.findOne(query);
+      res.send(result);
+    })
+    
     // Find user selected data
     app.get('/user/cart', async(req, res)=> {
       const selectedProducts = userCollection.find();
@@ -90,6 +98,27 @@ async function run() {
       const userInfo = req.body;
       const arr = [userInfo]
       const result = await userCollection.insertMany(arr);
+      res.send(result);
+    })
+
+    // put/update document
+    app.put('/productsId/:id', async(req, res)=> {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const options = { upsert: true };
+      const product = req.body;
+      const updateDoc = {
+        $set: {
+          prodName: product.prodName,
+          prodImage: product.prodImage,
+          prodPrice: product.prodPrice,
+          prodRating: product.prodRating,
+          shortDesc: product.shortDesc,
+          brand: product.shortDesc,
+          type: product.type
+        }
+      }
+      const result = await prodCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     })
 
